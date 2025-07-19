@@ -188,7 +188,7 @@ async def get_score_and_markdown(request: ScoreRequest):
             timestamp=datetime.now().isoformat()
         )
 
-@app.post("/api/optimize")
+@app.post("/api/optimize/v1")
 async def optimize(request: OptimizeRequest):
     """
     SSE streaming endpoint: Start optimization and stream events in response
@@ -274,6 +274,7 @@ async def optimize(request: OptimizeRequest):
             
             final_score = final_state.get('best_score', initial_score)
             optimized_html = final_state.get('best_html', html)
+            original_html = final_state.get('original_html', html)
             improvement = final_score - initial_score
             elapsed = time.time() - start_time
 
@@ -290,7 +291,7 @@ async def optimize(request: OptimizeRequest):
             yield {
                 "event": "complete",
                 "data": {
-                    "original_html": html,
+                    "original_html": original_html,
                     "optimized_html": optimized_html,
                     "updated_score": final_score,
                     "initial_score": initial_score,
@@ -310,6 +311,148 @@ async def optimize(request: OptimizeRequest):
             }
 
     # Return EventSourceResponse for proper SSE streaming
+    return EventSourceResponse(event_generator())
+
+
+@app.get("/api/optimize")
+async def optimize(
+    url: str = Query("https://www.hyperbots.com", description="Website URL"),
+    html: str = Query(None, description="Base64-encoded HTML content"),
+    markdown: str = Query(None, description="Base64-encoded Markdown content"),
+    score: float = Query(0.00, description="Initial SEO/GEO score"),
+    keyword: str = Query("Finance and Automation", description="Target keyword for optimization"),
+    threshold: float = Query(0.01, description="Minimum score improvement threshold"),
+):
+    """
+    SSE streaming endpoint using GET with query parameters (base64 encoded for HTML & Markdown).
+    Input: url, html (b64), markdown (b64), score, keyword, threshold
+    Output: SSE stream with start, step, complete, error events
+    """
+
+    try:
+        initial_score = score
+        html = base64.b64decode(html).decode("utf-8") if html else ""
+        markdown = base64.b64decode(markdown).decode("utf-8") if markdown else ""
+
+    except Exception as e:
+        return EventSourceResponse(
+            iter([{
+                "event": "error",
+                "data": {
+                    "error": f"Invalid query params: {str(e)}",
+                    "timestamp": datetime.now().isoformat()
+                }
+            }])
+        )
+
+    async def event_generator():
+        try:
+            # Send initial event
+            yield {
+                "event": "start",
+                "data": json.dumps({
+                    "message": "Optimization started",
+                    "url": url,
+                    "keyword": keyword,
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
+            # Step: Validation
+            yield {
+                "event": "step",
+                "data": json.dumps({
+                    "step": "validation",
+                    "message": "Validating inputs...",
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
+            # if not html or not markdown:
+            #     yield {
+            #         "event": "error",
+            #         "data": json.dumps({
+            #             "error": "HTML and Markdown content are required",
+            #             "timestamp": datetime.now().isoformat()
+            #         })
+            #     }
+            #     return
+
+            yield {
+                "event": "step",
+                "data": json.dumps({
+                    "step": "validated",
+                    "message": "Inputs validated",
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
+            # Step: Optimization
+            yield {
+                "event": "step",
+                "data": json.dumps({
+                    "step": "optimization",
+                    "message": "Running optimization...",
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
+            start_time = time.time()
+
+            # Perform the actual optimization using your agent
+            final_state = geo_agent.workflow.invoke({
+                "website_url": url,
+                "target_keyword": keyword,
+                "current_html": html,
+                "original_html": html,
+                "current_score": initial_score,
+                "improvement_threshold": threshold,
+                "optimization_history": [],
+                "best_score": initial_score,
+                "best_html": html,
+                "iteration_count": 0,
+                "max_iterations": 5,
+                "final_result": None
+            })
+
+            final_score = final_state.get('best_score', initial_score)
+            optimized_html = final_state.get('best_html', html)
+            original_html = final_state.get('original_html', html)
+            improvement = final_score - initial_score
+            elapsed = time.time() - start_time
+
+            # Keepalive (optional)
+            yield {
+                "event": "keepalive",
+                "data": json.dumps({
+                    "message": "Processing optimization...",
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
+            # Final result
+            yield {
+                "event": "complete",
+                "data": json.dumps({
+                    "original_html": original_html,
+                    "optimized_html": optimized_html,
+                    "updated_score": final_score,
+                    "initial_score": initial_score,
+                    "improvement": improvement,
+                    "time": elapsed,
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
+        except Exception as e:
+            yield {
+                "event": "error",
+                "data": json.dumps({
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat()
+                })
+            }
+
     return EventSourceResponse(event_generator())
 
 def main():
