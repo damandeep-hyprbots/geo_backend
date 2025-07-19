@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Random HTML Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      background: #fafafa;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 10px 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    section {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .card img {
+      width: 100%;
+      display: block;
+    }
+    .card-content {
+      padding: 15px;
+    }
+    footer {
+      background: #333;
+      color: #ccc;
+      text-align: center;
+      padding: 10px 0;
+      margin-top: 40px;
+    }
+    form input, form textarea, form button {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    form button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Welcome to Your Random Page</h1>
+    <nav>
+      <ul>
+        <li><a href="#">🏠 Home</a></li>
+        <li><a href="#">📖 About</a></li>
+        <li><a href="#">✉️ Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section>
+    <h2>About This Page</h2>
+    <p>This page was generated at random. It demonstrates common HTML elements:
+      headings, lists, cards, images, and a contact form—all styled with simple CSS.</p>
+  </section>
+
+  <section>
+    <h2>Features List</h2>
+    <ul>
+      <li>Responsive grid of cards</li>
+      <li>Placeholder images</li>
+      <li>Simple, clean styling</li>
+      <li>Contact form at the bottom</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Image Gallery</h2>
+    <div class="cards">
+      <div class="card">
+        <img src="https://via.placeholder.com/400x250?text=Image+1" alt="Placeholder 1">
+        <div class="card-content">
+          <h3>Sample Card 1</h3>
+          <p>This is a randomly generated description for the first card.</p>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://via.placeholder.com/400x250?text=Image+2" alt="Placeholder 2">
+        <div class="card-content">
+          <h3>Sample Card 2</h3>
+          <p>This is a randomly generated description for the second card.</p>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://via.placeholder.com/400x250?text=Image+3" alt="Placeholder 3">
+        <div class="card-content">
+          <h3>Sample Card 3</h3>
+          <p>This is a randomly generated description for the third card.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Contact Us</h2>
+    <form action="#" method="POST">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" placeholder="Your name">
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com">
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="4" placeholder="Type your message here"></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+
+  <footer>
+    &copy; 2025 Random HTML Generator. All rights reserved.
+  </footer>
+
+</body>
+</html>
